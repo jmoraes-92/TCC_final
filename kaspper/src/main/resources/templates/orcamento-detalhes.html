@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detalhes do Orçamento</title>
+</head>
+<body>
+    <h1>Detalhes do Orçamento</h1>
+    <p><strong>Cliente:</strong> <span th:text="${orcamento.demanda.cliente.nome}"></span></p>
+    <p><strong>Demanda:</strong> <span th:text="${orcamento.demanda.descricao}"></span></p>
+    <p><strong>Tarefas:</strong></p>
+    <ul>
+        <li th:each="tarefa : ${orcamento.demanda.tarefas}">
+            <span th:text="${tarefa.descricao}"></span> - Prazo: <span th:text="${tarefa.prazo}"></span>
+        </li>
+    </ul>
+    <p><strong>Valor:</strong> <span th:text="${orcamento.valor}"></span></p>
+    <p><strong>Prazo Estimado:</strong> <span th:text="${orcamento.prazoEstimado}"></span></p>
+    <p><strong>Status:</strong> <span th:text="${orcamento.status}"></span></p>
+</body>
+</html>

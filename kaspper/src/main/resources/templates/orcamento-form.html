@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Gerar Orçamento</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body class="container py-5">
+	<h1 class="mb-4 text-center">Gerar Orçamento</h1>
+
+	<!-- Formulário de Orçamento -->
+	<form id="orcamentoForm" class="row g-3">
+		<!-- Selecionar Demanda -->
+		<div class="col-md-6">
+			<label for="demanda" class="form-label">Demanda</label>
+			<select id="demanda" name="idDemanda" class="form-select" required>
+				<option value="" disabled selected>Selecione uma demanda</option>
+				<option th:each="demanda : ${demandas}" th:value="${demanda.id}"
+					th:text="${'ID: ' + demanda.id + ' - ' + demanda.descricao}"></option>
+			</select>
+		</div>
+
+		<!-- Cliente Associado -->
+		<div class="col-md-6">
+			<label for="cliente" class="form-label">Cliente</label>
+			<input type="text" id="cliente" class="form-control" readonly placeholder="Selecione uma demanda">
+		</div>
+
+		<!-- Tarefas Associadas -->
+		<div class="col-md-12">
+			<label for="tarefas" class="form-label">Tarefas Associadas</label>
+			<ul id="tarefas" class="list-group">
+				<li class="list-group-item">Nenhuma tarefa associada</li>
+			</ul>
+		</div>
+
+		<!-- Valor -->
+		<div class="col-md-6">
+			<label for="valor" class="form-label">Valor (R$)</label>
+			<input type="number" id="valor" name="valor" class="form-control" step="0.01">
+		</div>
+
+		<!-- Prazo Estimado -->
+		<div class="col-md-6">
+			<label for="prazoEstimado" class="form-label">Prazo Estimado (dias)</label>
+			<input type="number" id="prazoEstimado" name="prazoEstimado" class="form-control" min="1">
+		</div>
+
+		<!-- Botão Gerar Orçamento -->
+		<div class="col-12 d-flex justify-content-center">
+			<button type="button" id="gerarOrcamento" class="btn btn-primary">Gerar Orçamento</button>
+		</div>
+
+		<!-- Exibir Orçamento Gerado -->
+		<div id="orcamentoGerado" class="mt-4" style="display: none;">
+			<h3>Orçamento Gerado</h3>
+			<p><strong>Demanda:</strong> <span id="orcamentoDemanda"></span></p>
+			<p><strong>Cliente:</strong> <span id="orcamentoCliente"></span></p>
+			<p><strong>Tarefas:</strong> <span id="orcamentoTarefas"></span></p>
+			<p><strong>Valor:</strong> R$ <span id="orcamentoValor"></span></p>
+			<p><strong>Prazo Estimado:</strong> <span id="orcamentoPrazo"></span> dias</p>
+		</div>
+	</form>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		document.getElementById('demanda').addEventListener('change', async function () {
+			const demandaId = this.value;
+
+			// Chamar API para obter informações da demanda
+			const response = await fetch(`/api/demandas/${demandaId}`);
+			const demanda = await response.json();
+
+			// Preencher cliente associado
+			document.getElementById('cliente').value = demanda.cliente.nome;
+
+			// Preencher tarefas associadas
+			const tarefasList = document.getElementById('tarefas');
+			tarefasList.innerHTML = '';
+
+			if (demanda.tarefas.length === 0) {
+				tarefasList.innerHTML = '<li class="list-group-item">Nenhuma tarefa associada</li>';
+			} else {
+				demanda.tarefas.forEach(tarefa => {
+					const listItem = document.createElement('li');
+					listItem.className = 'list-group-item';
+					listItem.textContent = `ID: ${tarefa.idTarefa} - ${tarefa.descricao}`;
+					tarefasList.appendChild(listItem);
+				});
+			}
+		});
+
+		document.getElementById('gerarOrcamento').addEventListener('click', async function () {
+			const demandaId = document.getElementById('demanda').value;
+			const valor = document.getElementById('valor').value;
+			const prazoEstimado = document.getElementById('prazoEstimado').value;
+
+			if (!demandaId || !valor || !prazoEstimado) {
+				alert('Por favor, preencha todos os campos antes de gerar o orçamento.');
+				return;
+			}
+
+			try {
+				// Chamar API para gerar o orçamento
+				const response = await fetch('/api/orcamentos', {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify({idDemanda: demandaId, valor, prazoEstimado})
+				});
+
+				if (response.ok) {
+					const orcamento = await response.json();
+
+					// Redirecionar para a página de detalhes do orçamento
+					window.location.href = `/orcamentos/${orcamento.id}`;
+				} else {
+					alert('Erro ao gerar o orçamento. Tente novamente.');
+				}
+			} catch (error) {
+				console.error('Erro:', error);
+				alert('Erro inesperado ao gerar o orçamento.');
+			}
+		});
+	</script>
+</body>
+
+</html>
