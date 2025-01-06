@@ -2,6 +2,8 @@ package com.orcamentos.kaspper.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.orcamentos.kaspper.exception.ResourceNotFoundException;
 import com.orcamentos.kaspper.model.Tarefa;
 import com.orcamentos.kaspper.model.enums.StatusTarefa;
 import com.orcamentos.kaspper.repository.TarefaRepository;
@@ -50,5 +52,20 @@ public class TarefaService {
 			throw new IllegalArgumentException("Tarefa com ID " + id + " não encontrada.");
 		}
 		tarefaRepository.deleteById(id);
+	}
+	
+	public Tarefa atualizar(Long id, Tarefa tarefaAtualizada) {
+		// Verifica se a tarefa existe
+		Tarefa tarefaExistente = tarefaRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Tarefa com ID " + id + " não encontrada."));
+
+		// Atualiza os campos necessários
+		tarefaExistente.setDescricao(tarefaAtualizada.getDescricao());
+		tarefaExistente.setPrazo(tarefaAtualizada.getPrazo());
+		tarefaExistente.setResponsavel(tarefaAtualizada.getResponsavel());
+		tarefaExistente.setStatus(tarefaAtualizada.getStatus());
+
+		// Salva a tarefa atualizada no banco de dados
+		return tarefaRepository.save(tarefaExistente);
 	}
 }

@@ -2,14 +2,20 @@ package com.orcamentos.kaspper.controller;
 
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Orcamento;
+import com.orcamentos.kaspper.model.Tarefa;
 import com.orcamentos.kaspper.repository.DemandaRepository;
 import com.orcamentos.kaspper.repository.OrcamentoRepository;
+import com.orcamentos.kaspper.repository.TarefaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -21,6 +27,9 @@ public class OrcamentoViewController {
 
 	@Autowired
 	private DemandaRepository demandaRepository;
+
+	@Autowired
+	private TarefaRepository tarefaRepository;
 
 	@GetMapping
 	public String listarOrcamentos(Model model) {
@@ -39,7 +48,8 @@ public class OrcamentoViewController {
 	}
 
 	@PostMapping
-	public String salvar(@RequestParam Long idDemanda, @ModelAttribute Orcamento orcamento, Model model) {
+	public String salvar(@RequestParam Long idDemanda, @RequestParam BigDecimal valor,
+			@RequestParam Integer prazoEstimado, @ModelAttribute Orcamento orcamento, Model model) {
 		Optional<Demanda> demandaOptional = demandaRepository.findById(idDemanda);
 
 		if (demandaOptional.isEmpty()) {
@@ -52,6 +62,9 @@ public class OrcamentoViewController {
 
 		Demanda demanda = demandaOptional.get();
 		orcamento.setDemanda(demanda);
+		orcamento.setValor(valor);
+		orcamento.setPrazoEstimado(prazoEstimado);
+
 		Orcamento orcamentoSalvo = orcamentoRepository.save(orcamento);
 
 		return "redirect:/orcamentos/" + orcamentoSalvo.getId();
@@ -87,7 +100,22 @@ public class OrcamentoViewController {
 			return "redirect:/orcamentos";
 		}
 
-		model.addAttribute("orcamento", orcamentoOptional.get());
+		Orcamento orcamento = orcamentoOptional.get();
+		List<Tarefa> tarefas = tarefaRepository.findByDemandaId(orcamento.getDemanda().getId().intValue());
+
+		LocalDate prazoFinal = tarefas.stream().filter(tarefa -> tarefa.getPrazo() != null).map(Tarefa::getPrazo)
+				.max(LocalDate::compareTo).orElse(null);
+
+		int prazoEstimado = prazoFinal != null ? (int) ChronoUnit.DAYS.between(LocalDate.now(), prazoFinal) : 0;
+
+		BigDecimal valorTotal = orcamento.getValor();
+
+		model.addAttribute("orcamento", orcamento);
+		model.addAttribute("tarefas", tarefas);
+		model.addAttribute("prazoFinal", prazoFinal);
+		model.addAttribute("prazoEstimado", prazoEstimado);
+		model.addAttribute("valorTotal", valorTotal);
+
 		return "orcamento-detalhes";
 	}
 
