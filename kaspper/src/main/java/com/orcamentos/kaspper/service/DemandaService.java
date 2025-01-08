@@ -23,61 +23,63 @@ import java.util.Optional;
 @Service
 public class DemandaService {
 
-	@Autowired
-	private DemandaRepository demandaRepository;
+    @Autowired
+    private DemandaRepository demandaRepository;
 
-	@Autowired
-	private TarefaRepository tarefaRepository;
+    @Autowired
+    private TarefaRepository tarefaRepository;
 
-	@Autowired
-	private ClienteRepository clienteRepository;
+    @Autowired
+    private ClienteRepository clienteRepository;
 
-	/**
-	 * Cria uma nova demanda com tarefas associadas.
-	 */
-	@Transactional
-	public Demanda criarDemandaComTarefas(Demanda demanda, List<Tarefa> tarefasBase) {
-		if (demanda.getCliente() == null || demanda.getCliente().getId() == null) {
-			throw new IllegalArgumentException("Cliente is required to save a Demanda.");
-		}
+    @Transactional
+    public Demanda criarDemandaComTarefas(Demanda demanda, List<Tarefa> tarefasBase) {
+        if (demanda.getCliente() == null || demanda.getCliente().getId() == null) {
+            throw new IllegalArgumentException("Cliente is required to save a Demanda.");
+        }
 
-		Cliente cliente = clienteRepository.findById(demanda.getCliente().getId()).orElseThrow(
-				() -> new ResourceNotFoundException("Cliente not found with id: " + demanda.getCliente().getId()));
+        Cliente cliente = clienteRepository.findById(demanda.getCliente().getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Cliente not found with id: " + demanda.getCliente().getId()));
 
-		demanda.setCliente(cliente);
-		Demanda savedDemanda = demandaRepository.save(demanda);
+        demanda.setCliente(cliente);
+        Demanda savedDemanda = demandaRepository.save(demanda);
 
-		// Gerar e salvar tarefas associadas à demanda
-		for (Tarefa tarefaBase : tarefasBase) {
-			Tarefa tarefa = new Tarefa();
-			tarefa.setDemanda(savedDemanda);
-			tarefa.setDescricao(tarefaBase.getDescricao());
-			tarefa.setResponsavel(tarefaBase.getResponsavel());
-			tarefa.setStatus(StatusTarefa.PENDENTE);
-			tarefaRepository.save(tarefa);
-		}
+        for (Tarefa tarefaBase : tarefasBase) {
+            Tarefa tarefa = new Tarefa();
+            tarefa.setDemanda(savedDemanda);
+            tarefa.setDescricao(tarefaBase.getDescricao());
+            tarefa.setResponsavel(tarefaBase.getResponsavel());
+            tarefa.setStatus(StatusTarefa.PENDENTE);
+            tarefaRepository.save(tarefa);
+        }
 
-		return savedDemanda;
-	}
+        return savedDemanda;
+    }
 
-	/**
-	 * Salva uma nova demanda a partir de um DTO de solicitação.
-	 *
-	 * @param demandaRequestDTO Dados da solicitação.
-	 * @return A demanda salva.
-	 */
-	public Demanda salvar(DemandaRequestDTO demandaRequestDTO) {
-		Demanda demanda = new Demanda();
-		demanda.setDescricao(demandaRequestDTO.getDescricao());
-		demanda.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
-		demanda.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
+    @Transactional
+    public Demanda salvarDemanda(Demanda demanda) {
+        if (demanda.getCliente() == null || demanda.getCliente().getId() == null) {
+            throw new IllegalArgumentException("Cliente é obrigatório para salvar uma demanda.");
+        }
 
-		List<Tarefa> tarefasBase = demandaRequestDTO.getTarefas();
-		return criarDemandaComTarefas(demanda, tarefasBase);
-	}
-	
-	// adicionar tarefas a uma demanda existente
-	public Demanda adicionarTarefas(Long demandaId, List<Long> tarefaIds) {
+        Cliente cliente = clienteRepository.findById(demanda.getCliente().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com ID: " + demanda.getCliente().getId()));
+
+        demanda.setCliente(cliente);
+        return demandaRepository.save(demanda);
+    }
+
+    public Demanda salvar(DemandaRequestDTO demandaRequestDTO) {
+        Demanda demanda = new Demanda();
+        demanda.setDescricao(demandaRequestDTO.getDescricao());
+        demanda.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
+        demanda.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
+
+        List<Tarefa> tarefasBase = demandaRequestDTO.getTarefas();
+        return criarDemandaComTarefas(demanda, tarefasBase);
+    }
+
+    public Demanda adicionarTarefas(Long demandaId, List<Long> tarefaIds) {
         Demanda demanda = demandaRepository.findById(demandaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demanda não encontrada"));
         List<Tarefa> tarefas = tarefaRepository.findAllById(tarefaIds);
@@ -85,66 +87,36 @@ public class DemandaService {
         return demandaRepository.save(demanda);
     }
 
-	/**
-	 * Lista todas as demandas cadastradas.
-	 *
-	 * @return Lista de demandas.
-	 */
-	public List<Demanda> listarTodasDemandas() {
-		return demandaRepository.findAll();
-	}
+    public List<Demanda> listarTodasDemandas() {
+        return demandaRepository.findAll();
+    }
 
-	/**
-	 * Busca uma demanda pelo ID.
-	 *
-	 * @param id O ID da demanda.
-	 * @return A demanda encontrada.
-	 */
-	public Optional<Demanda> buscarPorId(Long id) {
-		return demandaRepository.findById(id);
-	}
+    public Optional<Demanda> buscarPorId(Long id) {
+        return demandaRepository.findById(id);
+    }
 
-	/**
-	 * Atualiza uma demanda existente com base no ID e no DTO fornecido.
-	 *
-	 * @param id                O ID da demanda a ser atualizada.
-	 * @param demandaRequestDTO Os novos dados para atualizar a demanda.
-	 * @return A demanda atualizada.
-	 */
-	public Demanda atualizarDemanda(Long id, DemandaRequestDTO demandaRequestDTO) {
-		// Buscar a demanda pelo ID
-		Optional<Demanda> demandaOptional = buscarPorId(id);
+    public Demanda atualizarDemanda(Long id, DemandaRequestDTO demandaRequestDTO) {
+        Optional<Demanda> demandaOptional = buscarPorId(id);
 
-		// Verificar se a demanda existe
-		if (!demandaOptional.isPresent()) {
-			throw new ResourceNotFoundException("Demanda com ID " + id + " não encontrada.");
-		}
+        if (!demandaOptional.isPresent()) {
+            throw new ResourceNotFoundException("Demanda com ID " + id + " não encontrada.");
+        }
 
-		// Obter o valor do Optional
-		Demanda demandaExistente = demandaOptional.get();
+        Demanda demandaExistente = demandaOptional.get();
+        demandaExistente.setDescricao(demandaRequestDTO.getDescricao());
+        demandaExistente.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
+        demandaExistente.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
 
-		// Atualizar os campos da demanda
-		demandaExistente.setDescricao(demandaRequestDTO.getDescricao());
-		demandaExistente.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
-		demandaExistente.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
+        return demandaRepository.save(demandaExistente);
+    }
 
-		// Salvar e retornar a demanda atualizada
-		return demandaRepository.save(demandaExistente);
-	}
+    public void deletarDemanda(Long id) {
+        Optional<Demanda> demandaOptional = buscarPorId(id);
+        if (!demandaOptional.isPresent()) {
+            throw new ResourceNotFoundException("Demanda com ID " + id + " não encontrada.");
+        }
 
-	/**
-	 * Deleta uma demanda pelo ID.
-	 *
-	 * @param id O ID da demanda a ser deletada.
-	 */
-	public void deletarDemanda(Long id) {
-		Optional<Demanda> demandaOptional = buscarPorId(id);
-		if (!demandaOptional.isPresent()) {
-			throw new ResourceNotFoundException("Demanda com ID " + id + " não encontrada.");
-		}
-
-		Demanda demanda = demandaOptional.get();
-		demandaRepository.delete(demanda);
-	}
-
+        Demanda demanda = demandaOptional.get();
+        demandaRepository.delete(demanda);
+    }
 }

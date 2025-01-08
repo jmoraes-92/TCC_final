@@ -67,6 +67,24 @@ public class DemandaController {
 
 		return ResponseEntity.ok(novaDemanda);
 	}
+	
+	@PostMapping("/criar")
+	public ResponseEntity<Demanda> criarDemanda(@RequestBody DemandaRequestDTO demandaRequestDTO) {
+	    Demanda demanda = new Demanda();
+	    demanda.setDescricao(demandaRequestDTO.getDescricao());
+
+	    if (!isValidStatus(demandaRequestDTO.getStatus())) {
+	        throw new IllegalArgumentException("Status inválido: " + demandaRequestDTO.getStatus());
+	    }
+
+	    demanda.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
+	    demanda.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
+	    demanda.setCliente(demandaRequestDTO.getCliente());
+
+	    Demanda novaDemanda = demandaService.salvarDemanda(demanda);
+	    return ResponseEntity.ok(novaDemanda);
+	}
+
 
 	@GetMapping
 	public ResponseEntity<List<Demanda>> listarDemandas() {
