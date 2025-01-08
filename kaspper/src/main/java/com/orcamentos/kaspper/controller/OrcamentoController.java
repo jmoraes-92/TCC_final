@@ -10,14 +10,12 @@ import com.orcamentos.kaspper.dto.OrcamentoRequestDTO;
 import com.orcamentos.kaspper.exception.ResourceNotFoundException;
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Orcamento;
-import com.orcamentos.kaspper.repository.DemandaRepository;
 import com.orcamentos.kaspper.service.DemandaService;
 import com.orcamentos.kaspper.service.OrcamentoService;
 
-import ch.qos.logback.core.model.Model;
-
 @RestController
 @RequestMapping("/api/orcamentos")
+@CrossOrigin(origins = "http://localhost:4200")
 public class OrcamentoController {
 
 	@Autowired
@@ -48,7 +46,7 @@ public class OrcamentoController {
 				.orElseThrow(() -> new ResourceNotFoundException("Demanda com ID " + idDemanda + " não encontrada."));
 
 		// Gerar o orçamento com base na demanda e suas tarefas
-		Orcamento novoOrcamento = orcamentoService.gerarOrcamento(demanda);
+		Orcamento novoOrcamento = orcamentoService.gerarOrcamento(demanda, requestDTO);
 
 		return ResponseEntity.ok(novoOrcamento);
 	}

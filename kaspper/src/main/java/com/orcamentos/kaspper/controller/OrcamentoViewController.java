@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/orcamentos")
+@CrossOrigin(origins = "http://localhost:4200")
 public class OrcamentoViewController {
 
 	@Autowired

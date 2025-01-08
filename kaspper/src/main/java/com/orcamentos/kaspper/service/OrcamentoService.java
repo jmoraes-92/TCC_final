@@ -1,5 +1,6 @@
 package com.orcamentos.kaspper.service;
 
+import com.orcamentos.kaspper.dto.OrcamentoRequestDTO;
 import com.orcamentos.kaspper.exception.ResourceNotFoundException;
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Orcamento;
@@ -31,19 +32,23 @@ public class OrcamentoService {
 	private DemandaRepository demandaRepository;
 
 	// Gerar orçamento baseado em uma única demanda
-	public Orcamento gerarOrcamento(Demanda demanda) {
+	public Orcamento gerarOrcamento(Demanda demanda, OrcamentoRequestDTO requestDTO) {
 		List<Tarefa> tarefas = tarefaRepository.findByDemanda(demanda);
 
-		BigDecimal custoEstimado = calcularCustoEstimado(demanda.getPrioridade(), tarefas.size());
-		int prazoEstimado = calcularPrazoEstimado(tarefas.size());
+		BigDecimal custoEstimado = requestDTO.getValor() != null ? requestDTO.getValor()
+				: calcularCustoEstimado(demanda.getPrioridade(), tarefas.size());
+
+		int prazoEstimado = requestDTO.getPrazoEstimado() != null ? requestDTO.getPrazoEstimado()
+				: calcularPrazoEstimado(tarefas.size());
 
 		Orcamento orcamento = new Orcamento();
 		orcamento.setDemanda(demanda);
 		orcamento.setValor(custoEstimado);
 		orcamento.setPrazoEstimado(prazoEstimado);
+		orcamento.setObservacoes(requestDTO.getObservacoes() != null ? requestDTO.getObservacoes()
+				: "Orçamento gerado automaticamente.");
+		orcamento.setStatus(requestDTO.getStatus() != null ? requestDTO.getStatus() : "PENDENTE");
 		orcamento.setDataGeracao(LocalDateTime.now());
-		orcamento.setObservacoes("Orçamento gerado automaticamente.");
-		orcamento.setStatus("PENDENTE");
 
 		return orcamentoRepository.save(orcamento);
 	}
@@ -54,8 +59,13 @@ public class OrcamentoService {
 	}
 
 	private int calcularPrazoEstimado(int quantidadeTarefas) {
-		// Implementação do cálculo de prazo estimado
-		return 0;
+		// Se não houver tarefas, retornar um prazo padrão de 1 dia
+		if (quantidadeTarefas <= 0) {
+			return 1;
+		}
+		// Definir o prazo como sendo o número de tarefas multiplicado por um fator
+		// (ex.: 2 dias por tarefa)
+		return quantidadeTarefas * 2;
 	}
 
 	// salvar

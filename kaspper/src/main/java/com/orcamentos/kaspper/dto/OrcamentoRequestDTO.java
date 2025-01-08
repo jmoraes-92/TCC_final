@@ -15,6 +15,26 @@ public class OrcamentoRequestDTO {
     @JsonProperty("prazo_estimado")
     private Integer prazoEstimado;
 
+    private String observacoes;
+    
+    public String getObservacoes() {
+		return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+		this.observacoes = observacoes;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	private String status; 
+    
     public Long getIdDemanda() {
         return id_demanda;
     }
