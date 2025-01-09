@@ -1,20 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Detalhes do Orçamento</title>
+	<meta charset="UTF-8">
+	<title>Detalhes do Orçamento</title>
 </head>
+
 <body>
-    <h1>Detalhes do Orçamento</h1>
-    <p><strong>Cliente:</strong> <span th:text="${orcamento.demanda.cliente.nome}"></span></p>
-    <p><strong>Demanda:</strong> <span th:text="${orcamento.demanda.descricao}"></span></p>
-    <p><strong>Tarefas:</strong></p>
-    <ul>
-        <li th:each="tarefa : ${orcamento.demanda.tarefas}">
-            <span th:text="${tarefa.descricao}"></span> - Prazo: <span th:text="${tarefa.prazo}"></span>
-        </li>
-    </ul>
-    <p><strong>Valor:</strong> <span th:text="${orcamento.valor}"></span></p>
-    <p><strong>Prazo Estimado:</strong> <span th:text="${orcamento.prazoEstimado}"></span></p>
-    <p><strong>Status:</strong> <span th:text="${orcamento.status}"></span></p>
+	<h1>Detalhes do Orçamento</h1>
+
+	<!-- Informações do Cliente -->
+	<div>
+		<h2>Cliente</h2>
+		<p><strong>Nome:</strong> <span th:text="${orcamento.demanda.cliente.nome}"></span></p>
+		<p><strong>Empresa:</strong> <span th:text="${orcamento.demanda.cliente.empresa}"></span></p>
+		<p><strong>Email:</strong> <span th:text="${orcamento.demanda.cliente.email}"></span></p>
+		<p><strong>Telefone:</strong> <span th:text="${orcamento.demanda.cliente.telefone}"></span></p>
+	</div>
+
+	<!-- Informações da Demanda -->
+	<div>
+		<h2>Demanda</h2>
+		<p><strong>Descrição:</strong> <span th:text="${orcamento.demanda.descricao}"></span></p>
+		<p><strong>Prioridade:</strong> <span th:text="${orcamento.demanda.prioridade}"></span></p>
+		<p><strong>Status:</strong> <span th:text="${orcamento.demanda.status}"></span></p>
+	</div>
+
+	<!-- Lista de Tarefas -->
+	<div>
+		<h2>Tarefas</h2>
+		<table border="1">
+			<thead>
+				<tr>
+					<th>Descrição</th>
+					<th>Prazo</th>
+					<th>Responsável</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="tarefa : ${tarefas}">
+					<td th:text="${tarefa.descricao}"></td>
+					<td th:text="${tarefa.prazo}"></td>
+					<td th:text="${tarefa.responsavel}"></td>
+					<td th:text="${tarefa.status}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6">
+			<p><strong>Prazo Estimado:</strong> <span th:text="${prazoEstimado} + ' dias'"></span></p>
+		</div>
+		<div class="col-md-6">
+			<p><strong>Valor Total:</strong> R$ <span th:text="${valorTotal}"></span></p>
+		</div>
+	</div>
+
+
+	<!-- Resumo do Orçamento -->
+	<div>
+		<h2>Resumo</h2>
+		<p><strong>Prazo Final:</strong> <span th:text="${prazoFinal}"></span></p>
+		<p><strong>Prazo Estimado:</strong> <span th:text="${prazoEstimado}"></span> dias</p>
+		<p><strong>Valor Total:</strong> R$ <span th:text="${valorTotal}"></span></p>
+	</div>
 </body>
+
 </html>

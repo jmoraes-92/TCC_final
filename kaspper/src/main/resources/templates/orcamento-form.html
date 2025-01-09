@@ -40,13 +40,13 @@
 		<!-- Valor -->
 		<div class="col-md-6">
 			<label for="valor" class="form-label">Valor (R$)</label>
-			<input type="number" id="valor" name="valor" class="form-control" step="0.01">
+			<input type="number" id="valor" name="valor" class="form-control" step="0.01" required>
 		</div>
 
 		<!-- Prazo Estimado -->
 		<div class="col-md-6">
 			<label for="prazoEstimado" class="form-label">Prazo Estimado (dias)</label>
-			<input type="number" id="prazoEstimado" name="prazoEstimado" class="form-control" min="1">
+			<input type="number" id="prazoEstimado" name="prazoEstimado" class="form-control" min="1" required>
 		</div>
 
 		<!-- Botão Gerar Orçamento -->
@@ -104,17 +104,19 @@
 			}
 
 			try {
-				// Chamar API para gerar o orçamento
+				// Submissão da requisição para salvar o orçamento
 				const response = await fetch('/api/orcamentos', {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
-					body: JSON.stringify({idDemanda: demandaId, valor, prazoEstimado})
+					body: JSON.stringify({
+						idDemanda: demandaId,
+						valor: parseFloat(valor),
+						prazoEstimado: parseInt(prazoEstimado, 10)
+					})
 				});
 
 				if (response.ok) {
 					const orcamento = await response.json();
-
-					// Redirecionar para a página de detalhes do orçamento
 					window.location.href = `/orcamentos/${orcamento.id}`;
 				} else {
 					alert('Erro ao gerar o orçamento. Tente novamente.');
@@ -124,6 +126,7 @@
 				alert('Erro inesperado ao gerar o orçamento.');
 			}
 		});
+
 	</script>
 </body>
 
