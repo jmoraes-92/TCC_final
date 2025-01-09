@@ -44,47 +44,48 @@ public class DemandaController {
 			throw new IllegalArgumentException("Status inválido: " + demandaRequestDTO.getStatus());
 		}
 
-		// Verificar comprimento do status
-		if (demandaRequestDTO.getStatus().length() > 20) {
-			throw new IllegalArgumentException("Status inválido ou muito longo.");
-		}
-
-		// Converter os valores String para os enums correspondentes
 		demanda.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
 		demanda.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
-		demanda.setCliente(demandaRequestDTO.getCliente()); // Mapeando cliente do DTO para a entidade
+		demanda.setCliente(demandaRequestDTO.getCliente());
 
-		// Buscar tarefas existentes pelos IDs fornecidos
+		// Verificar se IDs de tarefas foram fornecidos
 		if (demandaRequestDTO.getIdsTarefasExistentes() != null
 				&& !demandaRequestDTO.getIdsTarefasExistentes().isEmpty()) {
+			// Buscar tarefas existentes pelos IDs
 			List<Tarefa> tarefasExistentes = tarefaService
 					.buscarTarefasPorIds(demandaRequestDTO.getIdsTarefasExistentes());
-			demanda.getTarefas().addAll(tarefasExistentes); // Associar tarefas existentes à demanda
+
+			if (tarefasExistentes.isEmpty()) {
+				throw new ResourceNotFoundException("Nenhuma tarefa encontrada para os IDs fornecidos.");
+			}
+
+			// Associar tarefas existentes à demanda
+			demanda.setTarefas(tarefasExistentes);
+		} else {
+			throw new IllegalArgumentException("É necessário fornecer ao menos um ID de tarefa existente.");
 		}
 
-		// Criar novas tarefas, se fornecidas
-		Demanda novaDemanda = demandaService.criarDemandaComTarefas(demanda, demandaRequestDTO.getTarefas());
-
+		// Salvar a demanda com as tarefas associadas
+		Demanda novaDemanda = demandaService.salvarDemanda(demanda);
 		return ResponseEntity.ok(novaDemanda);
 	}
-	
+
 	@PostMapping("/criar")
 	public ResponseEntity<Demanda> criarDemanda(@RequestBody DemandaRequestDTO demandaRequestDTO) {
-	    Demanda demanda = new Demanda();
-	    demanda.setDescricao(demandaRequestDTO.getDescricao());
+		Demanda demanda = new Demanda();
+		demanda.setDescricao(demandaRequestDTO.getDescricao());
 
-	    if (!isValidStatus(demandaRequestDTO.getStatus())) {
-	        throw new IllegalArgumentException("Status inválido: " + demandaRequestDTO.getStatus());
-	    }
+		if (!isValidStatus(demandaRequestDTO.getStatus())) {
+			throw new IllegalArgumentException("Status inválido: " + demandaRequestDTO.getStatus());
+		}
 
-	    demanda.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
-	    demanda.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
-	    demanda.setCliente(demandaRequestDTO.getCliente());
+		demanda.setPrioridade(Prioridade.valueOf(demandaRequestDTO.getPrioridade().toUpperCase()));
+		demanda.setStatus(StatusDemanda.valueOf(demandaRequestDTO.getStatus().toUpperCase()));
+		demanda.setCliente(demandaRequestDTO.getCliente());
 
-	    Demanda novaDemanda = demandaService.salvarDemanda(demanda);
-	    return ResponseEntity.ok(novaDemanda);
+		Demanda novaDemanda = demandaService.salvarDemanda(demanda);
+		return ResponseEntity.ok(novaDemanda);
 	}
-
 
 	@GetMapping
 	public ResponseEntity<List<Demanda>> listarDemandas() {
@@ -109,13 +110,13 @@ public class DemandaController {
 		Demanda demanda = demandaService.atualizarDemanda(id, demandaRequestDTO);
 		return ResponseEntity.ok(demanda);
 	}
-	
-    @PutMapping("/{id}/adicionar-tarefas")
-    public ResponseEntity<Demanda> adicionarTarefas(@PathVariable Long id, @RequestBody List<Long> tarefaIds) {
-        Demanda demandaAtualizada = demandaService.adicionarTarefas(id, tarefaIds);
-        return ResponseEntity.ok(demandaAtualizada);
-    }
-	 
+
+	@PutMapping("/{id}/adicionar-tarefas")
+	public ResponseEntity<Demanda> adicionarTarefas(@PathVariable Long id, @RequestBody List<Long> tarefaIds) {
+		Demanda demandaAtualizada = demandaService.adicionarTarefas(id, tarefaIds);
+		return ResponseEntity.ok(demandaAtualizada);
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deletarDemanda(@PathVariable Long id) {
 		demandaService.deletarDemanda(id);
