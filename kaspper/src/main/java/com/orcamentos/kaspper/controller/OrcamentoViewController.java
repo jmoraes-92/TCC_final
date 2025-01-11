@@ -1,8 +1,10 @@
 package com.orcamentos.kaspper.controller;
 
+import com.orcamentos.kaspper.model.Cliente;
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Orcamento;
 import com.orcamentos.kaspper.model.Tarefa;
+import com.orcamentos.kaspper.repository.ClienteRepository;
 import com.orcamentos.kaspper.repository.DemandaRepository;
 import com.orcamentos.kaspper.repository.OrcamentoRepository;
 import com.orcamentos.kaspper.repository.TarefaRepository;
@@ -15,7 +17,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Controller
@@ -23,101 +24,131 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:4200")
 public class OrcamentoViewController {
 
-	@Autowired
-	private OrcamentoRepository orcamentoRepository;
+    @Autowired
+    private OrcamentoRepository orcamentoRepository;
 
-	@Autowired
-	private DemandaRepository demandaRepository;
+    @Autowired
+    private DemandaRepository demandaRepository;
 
-	@Autowired
-	private TarefaRepository tarefaRepository;
+    @Autowired
+    private TarefaRepository tarefaRepository;
 
-	@GetMapping
-	public String listarOrcamentos(Model model) {
-		List<Orcamento> orcamentos = orcamentoRepository.findAll();
-		model.addAttribute("orcamentos", orcamentos);
-		return "orcamentos-list";
-	}
+    @Autowired
+    private ClienteRepository clienteRepository;
 
-	@GetMapping("/novo")
-	public String novoOrcamento(Model model) {
-		Orcamento orcamento = new Orcamento();
-		List<Demanda> demandas = demandaRepository.findAll();
-		model.addAttribute("orcamento", orcamento);
-		model.addAttribute("demandas", demandas);
-		return "orcamento-form";
-	}
+    @GetMapping
+    public String listarOrcamentos(Model model) {
+        List<Orcamento> orcamentos = orcamentoRepository.findAll();
+        model.addAttribute("orcamentos", orcamentos);
+        return "orcamentos-list";
+    }
 
-	@PostMapping
-	public String salvar(@RequestParam Long idDemanda, @RequestParam BigDecimal valor,
-			@RequestParam Integer prazoEstimado, @ModelAttribute Orcamento orcamento, Model model) {
-		Optional<Demanda> demandaOptional = demandaRepository.findById(idDemanda);
+    @GetMapping("/novo")
+    public String novoOrcamento(Model model) {
+        Orcamento orcamento = new Orcamento();
+        List<Demanda> demandas = demandaRepository.findAll();
+        model.addAttribute("orcamento", orcamento);
+        model.addAttribute("demandas", demandas);
+        return "orcamento-form";
+    }
 
-		if (demandaOptional.isEmpty()) {
-			model.addAttribute("erro", "Demanda selecionada não encontrada.");
-			List<Demanda> demandas = demandaRepository.findAll();
-			model.addAttribute("orcamento", orcamento);
-			model.addAttribute("demandas", demandas);
-			return "orcamento-form";
-		}
+    @PostMapping
+    public String salvar(@RequestParam Long idDemanda, @RequestParam BigDecimal valor,
+                         @RequestParam Integer prazoEstimado, @ModelAttribute Orcamento orcamento, Model model) {
+        Optional<Demanda> demandaOptional = demandaRepository.findById(idDemanda);
 
-		Demanda demanda = demandaOptional.get();
-		orcamento.setDemanda(demanda);
-		orcamento.setValor(valor);
-		orcamento.setPrazoEstimado(prazoEstimado);
+        if (demandaOptional.isEmpty()) {
+            model.addAttribute("erro", "Demanda selecionada não encontrada.");
+            List<Demanda> demandas = demandaRepository.findAll();
+            model.addAttribute("orcamento", orcamento);
+            model.addAttribute("demandas", demandas);
+            return "orcamento-form";
+        }
 
-		Orcamento orcamentoSalvo = orcamentoRepository.save(orcamento);
+        Demanda demanda = demandaOptional.get();
+        orcamento.setDemanda(demanda);
+        orcamento.setValor(valor);
+        orcamento.setPrazoEstimado(prazoEstimado);
 
-		return "redirect:/orcamentos/" + orcamentoSalvo.getId();
-	}
+        Orcamento orcamentoSalvo = orcamentoRepository.save(orcamento);
 
-	@GetMapping("/editar/{id}")
-	public String editarOrcamento(@PathVariable Long id, Model model) {
-		Optional<Orcamento> orcamentoOptional = orcamentoRepository.findById(id);
+        return "redirect:/orcamentos/" + orcamentoSalvo.getId();
+    }
 
-		if (orcamentoOptional.isEmpty()) {
-			model.addAttribute("erro", "Orçamento não encontrado.");
-			return "redirect:/orcamentos";
-		}
+    @GetMapping("/editar/{id}")
+    public String editarOrcamento(@PathVariable Long id, Model model) {
+        Optional<Orcamento> orcamentoOptional = orcamentoRepository.findById(id);
 
-		List<Demanda> demandas = demandaRepository.findAll();
-		model.addAttribute("orcamento", orcamentoOptional.get());
-		model.addAttribute("demandas", demandas);
-		return "orcamento-form";
-	}
+        if (orcamentoOptional.isEmpty()) {
+            model.addAttribute("erro", "Orçamento não encontrado.");
+            return "redirect:/orcamentos";
+        }
 
-	@GetMapping("/deletar/{id}")
-	public String deletarOrcamento(@PathVariable Long id) {
-		orcamentoRepository.deleteById(id);
-		return "redirect:/orcamentos";
-	}
+        List<Demanda> demandas = demandaRepository.findAll();
+        model.addAttribute("orcamento", orcamentoOptional.get());
+        model.addAttribute("demandas", demandas);
+        return "orcamento-form";
+    }
 
-	@GetMapping("/{id}")
-	public String exibirOrcamento(@PathVariable Long id, Model model) {
-		Optional<Orcamento> orcamentoOptional = orcamentoRepository.findById(id);
+    @GetMapping("/deletar/{id}")
+    public String deletarOrcamento(@PathVariable Long id) {
+        orcamentoRepository.deleteById(id);
+        return "redirect:/orcamentos";
+    }
 
-		if (orcamentoOptional.isEmpty()) {
-			model.addAttribute("erro", "Orçamento não encontrado.");
-			return "redirect:/orcamentos";
-		}
+    @GetMapping("/{id}")
+    public String exibirOrcamento(@PathVariable Long id, Model model) {
+        Optional<Orcamento> orcamentoOptional = orcamentoRepository.findById(id);
 
-		Orcamento orcamento = orcamentoOptional.get();
-		List<Tarefa> tarefas = tarefaRepository.findByDemandaId(orcamento.getDemanda().getId().intValue());
+        if (orcamentoOptional.isEmpty()) {
+            model.addAttribute("erro", "Orçamento não encontrado.");
+            return "redirect:/orcamentos";
+        }
 
-		LocalDate prazoFinal = tarefas.stream().filter(tarefa -> tarefa.getPrazo() != null).map(Tarefa::getPrazo)
-				.max(LocalDate::compareTo).orElse(null);
+        Orcamento orcamento = orcamentoOptional.get();
+        List<Tarefa> tarefas = tarefaRepository.findByDemandaId(orcamento.getDemanda().getId().intValue());
 
-		int prazoEstimado = prazoFinal != null ? (int) ChronoUnit.DAYS.between(LocalDate.now(), prazoFinal) : 0;
+        LocalDate prazoFinal = tarefas.stream().filter(tarefa -> tarefa.getPrazo() != null).map(Tarefa::getPrazo)
+                .max(LocalDate::compareTo).orElse(null);
 
-		BigDecimal valorTotal = orcamento.getValor();
+        int prazoEstimado = prazoFinal != null ? (int) ChronoUnit.DAYS.between(LocalDate.now(), prazoFinal) : 0;
 
-		model.addAttribute("orcamento", orcamento);
-		model.addAttribute("tarefas", tarefas);
-		model.addAttribute("prazoFinal", prazoFinal);
-		model.addAttribute("prazoEstimado", prazoEstimado);
-		model.addAttribute("valorTotal", valorTotal);
+        BigDecimal valorTotal = orcamento.getValor();
 
-		return "orcamento-detalhes";
-	}
+        model.addAttribute("orcamento", orcamento);
+        model.addAttribute("tarefas", tarefas);
+        model.addAttribute("prazoFinal", prazoFinal);
+        model.addAttribute("prazoEstimado", prazoEstimado);
+        model.addAttribute("valorTotal", valorTotal);
+
+        return "orcamento-detalhes";
+    }
+
+    @GetMapping("/tarefas")
+    public String listarTarefas(Model model) {
+        List<Tarefa> tarefas = tarefaRepository.findAll();
+        if (tarefas.isEmpty()) {
+            System.out.println("Nenhuma tarefa encontrada.");
+        } else {
+            System.out.println("Tarefas encontradas: " + tarefas.size());
+        }
+        model.addAttribute("tarefas", tarefas);
+        return "tarefas";
+    }
+
+    @GetMapping("/tarefas/nova")
+    public String novaTarefa(Model model) {
+        model.addAttribute("tarefa", new Tarefa());
+        return "tarefa-form";
+    }
+
+    @GetMapping("/clientes/form")
+    public String listarClientes(Model model) {
+        System.out.println("Chamando método listarClientes");
+        List<Cliente> clientes = clienteRepository.findAll();
+        model.addAttribute("clientes", clientes);
+        model.addAttribute("cliente", new Cliente());
+        return "cliente-form";
+    }
 
 }
