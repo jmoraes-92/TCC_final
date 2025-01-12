@@ -6,83 +6,133 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Gerar Orçamento</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body class="container py-5">
-	<h1 class="mb-4 text-center">Gerar Orçamento</h1>
+	<div class="card shadow-lg p-4 mb-5 bg-body-tertiary rounded">
+		<h1 class="mb-4 text-center">Gerar Orçamento</h1>
+		<p class="text-center text-muted">Preencha as informações abaixo para gerar um novo orçamento.</p>
 
-	<!-- Formulário de Orçamento -->
-	<form id="orcamentoForm" class="row g-3">
-		<!-- Selecionar Demanda -->
-		<div class="col-md-6">
-			<label for="demanda" class="form-label">Demanda</label>
-			<select id="demanda" name="idDemanda" class="form-select" required>
-				<option value="" disabled selected>Selecione uma demanda</option>
-				<option th:each="demanda : ${demandas}" th:value="${demanda.id}"
-					th:text="${'ID: ' + demanda.id + ' - ' + demanda.descricao}"></option>
-			</select>
-		</div>
+		<!-- Formulário de Orçamento -->
+		<form id="orcamentoForm" class="row g-4">
+			<!-- Selecionar Demanda -->
+			<div class="col-md-6">
+				<label for="demanda" class="form-label">Demanda</label>
+				<select id="demanda" name="idDemanda" class="form-select" required>
+					<option value="" disabled selected>Selecione uma demanda</option>
+					<option th:each="demanda : ${demandas}" th:value="${demanda.id}"
+						th:text="${'ID: ' + demanda.id + ' - ' + demanda.descricao}"></option>
+				</select>
+			</div>
 
-		<!-- Cliente Associado -->
-		<div class="col-md-6">
-			<label for="cliente" class="form-label">Cliente</label>
-			<input type="text" id="cliente" class="form-control" readonly placeholder="Selecione uma demanda">
-		</div>
+			<!-- Cliente Associado -->
+			<div class="col-md-6">
+				<label for="cliente" class="form-label">Cliente</label>
+				<input type="text" id="cliente" class="form-control" readonly placeholder="Selecione uma demanda">
+			</div>
 
-		<!-- Tarefas Associadas -->
-		<div class="col-md-12">
-			<label for="tarefas" class="form-label">Tarefas Associadas</label>
-			<ul id="tarefas" class="list-group">
-				<li class="list-group-item">Nenhuma tarefa associada</li>
-			</ul>
-		</div>
+			<!-- Tarefas Associadas -->
+			<div class="col-md-12">
+				<label for="tarefas" class="form-label">Tarefas Associadas</label>
+				<ul id="tarefas" class="list-group">
+					<li class="list-group-item">Nenhuma tarefa associada</li>
+				</ul>
+				<!-- Botão para abrir o modal de adicionar tarefa -->
+				<button type="button" class="btn btn-success mt-3 d-none" id="adicionarTarefaModal"
+					data-bs-toggle="modal" data-bs-target="#modalTarefa">
+					<span class="material-icons">add</span> Adicionar Tarefa
+				</button>
+			</div>
 
-		<!-- Valor -->
-		<div class="col-md-6">
-			<label for="valor" class="form-label">Valor (R$)</label>
-			<input type="number" id="valor" name="valor" class="form-control" step="0.01" required>
-		</div>
+			<!-- Valor -->
+			<div class="col-md-6">
+				<label for="valor" class="form-label">Valor (R$)</label>
+				<input type="number" id="valor" name="valor" class="form-control" step="0.01" required>
+			</div>
 
-		<!-- Prazo Estimado -->
-		<div class="col-md-6">
-			<label for="prazoEstimado" class="form-label">Prazo Estimado (dias)</label>
-			<input type="number" id="prazoEstimado" name="prazoEstimado" class="form-control" min="1" required>
-		</div>
+			<!-- Prazo Estimado -->
+			<div class="col-md-6">
+				<label for="prazoEstimado" class="form-label">Prazo Estimado (dias)</label>
+				<input type="number" id="prazoEstimado" name="prazoEstimado" class="form-control" min="1" required>
+			</div>
 
-		<!-- Botão Gerar Orçamento -->
-		<div class="col-12 d-flex justify-content-center">
-			<button type="button" id="gerarOrcamento" class="btn btn-primary">Gerar Orçamento</button>
-		</div>
+			<!-- Botão Gerar Orçamento -->
+			<div class="col-12 d-flex justify-content-center">
+				<button type="button" id="gerarOrcamento" class="btn btn-primary">
+					<i class="bi bi-file-earmark-plus"></i> Gerar Orçamento
+				</button>
+			</div>
 
-		<!-- Exibir Orçamento Gerado -->
-		<div id="orcamentoGerado" class="mt-4" style="display: none;">
-			<h3>Orçamento Gerado</h3>
-			<p><strong>Demanda:</strong> <span id="orcamentoDemanda"></span></p>
-			<p><strong>Cliente:</strong> <span id="orcamentoCliente"></span></p>
-			<p><strong>Tarefas:</strong> <span id="orcamentoTarefas"></span></p>
-			<p><strong>Valor:</strong> R$ <span id="orcamentoValor"></span></p>
-			<p><strong>Prazo Estimado:</strong> <span id="orcamentoPrazo"></span> dias</p>
+			<!-- Exibir Orçamento Gerado -->
+			<div id="orcamentoGerado" class="alert alert-success mt-4" style="display: none;">
+				<h4 class="alert-heading">Orçamento Gerado com Sucesso!</h4>
+				<p><strong>Demanda:</strong> <span id="orcamentoDemanda"></span></p>
+				<p><strong>Cliente:</strong> <span id="orcamentoCliente"></span></p>
+				<p><strong>Tarefas:</strong> <span id="orcamentoTarefas"></span></p>
+				<p><strong>Valor:</strong> R$ <span id="orcamentoValor"></span></p>
+				<p><strong>Prazo Estimado:</strong> <span id="orcamentoPrazo"></span> dias</p>
+			</div>
+		</form>
+	</div>
+
+	<!-- Modal para adicionar tarefa -->
+	<div class="modal fade" id="modalTarefa" tabindex="-1" aria-labelledby="modalTarefaLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTarefaLabel">Adicionar Nova Tarefa</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="tarefaForm">
+						<div class="mb-3">
+							<label for="descricaoTarefa" class="form-label">Descrição</label>
+							<input type="text" id="descricaoTarefa" class="form-control" required>
+						</div>
+						<div class="mb-3">
+							<label for="responsavelTarefa" class="form-label">Responsável</label>
+							<input type="text" id="responsavelTarefa" class="form-control" required>
+						</div>
+						<div class="mb-3">
+							<label for="prazoTarefa" class="form-label">Prazo</label>
+							<input type="date" id="prazoTarefa" class="form-control" required>
+						</div>
+						<div class="mb-3">
+							<label for="statusTarefa" class="form-label">Status</label>
+							<select id="statusTarefa" class="form-select" required>
+								<option value="PENDENTE" selected>Pendente</option>
+								<option value="CONCLUIDA">Concluída</option>
+							</select>
+						</div>
+						<div class="d-flex justify-content-end">
+							<button type="button" id="salvarTarefa" class="btn btn-success">Salvar</button>
+						</div>
+					</form>
+				</div>
+			</div>
 		</div>
-	</form>
+	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
+		let demandaSelecionada = null;
+
 		document.getElementById('demanda').addEventListener('change', async function () {
 			const demandaId = this.value;
+			demandaSelecionada = demandaId;
 
-			// Chamar API para obter informações da demanda
 			const response = await fetch(`/api/demandas/${demandaId}`);
 			const demanda = await response.json();
 
-			// Preencher cliente associado
 			document.getElementById('cliente').value = demanda.cliente.nome;
 
-			// Preencher tarefas associadas
 			const tarefasList = document.getElementById('tarefas');
 			tarefasList.innerHTML = '';
 
 			if (demanda.tarefas.length === 0) {
 				tarefasList.innerHTML = '<li class="list-group-item">Nenhuma tarefa associada</li>';
+				document.getElementById('adicionarTarefaModal').classList.remove('d-none');
 			} else {
 				demanda.tarefas.forEach(tarefa => {
 					const listItem = document.createElement('li');
@@ -90,6 +140,58 @@
 					listItem.textContent = `ID: ${tarefa.idTarefa} - ${tarefa.descricao}`;
 					tarefasList.appendChild(listItem);
 				});
+				document.getElementById('adicionarTarefaModal').classList.remove('d-none');
+			}
+		});
+
+		document.getElementById('salvarTarefa').addEventListener('click', async function () {
+			const descricao = document.getElementById('descricaoTarefa').value;
+			const responsavel = document.getElementById('responsavelTarefa').value;
+			const prazo = document.getElementById('prazoTarefa').value;
+			const status = document.getElementById('statusTarefa').value;
+
+			if (!descricao || !responsavel || !prazo) {
+				alert('Preencha todos os campos para adicionar a tarefa.');
+				return;
+			}
+
+			try {
+				const response = await fetch('/api/tarefas', {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify({
+						idDemanda: parseInt(demandaSelecionada, 10),
+						descricao,
+						responsavel,
+						prazo,
+						status
+					})
+				});
+
+				if (response.ok) {
+					const novaTarefa = await response.json();
+					alert('Tarefa adicionada com sucesso!');
+
+					// Atualizar a lista de tarefas sem recarregar a página
+					const tarefasList = document.getElementById('tarefas');
+					const listItem = document.createElement('li');
+					listItem.className = 'list-group-item';
+					listItem.textContent = `ID: ${novaTarefa.idTarefa} - ${novaTarefa.descricao}`;
+					tarefasList.appendChild(listItem);
+
+					// Fechar o modal
+					const modalElement = document.getElementById('modalTarefa');
+					const modalInstance = bootstrap.Modal.getInstance(modalElement);
+					modalInstance.hide();
+
+					// Limpar os campos do modal
+					document.getElementById('tarefaForm').reset();
+				} else {
+					alert('Erro ao adicionar a tarefa. Tente novamente.');
+				}
+			} catch (error) {
+				console.error('Erro:', error);
+				alert('Erro inesperado ao adicionar a tarefa.');
 			}
 		});
 
@@ -104,7 +206,6 @@
 			}
 
 			try {
-				// Submissão da requisição para salvar o orçamento
 				const response = await fetch('/api/orcamentos', {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
