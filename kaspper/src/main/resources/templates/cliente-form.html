@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${cliente.id != null} ? 'Editar Cliente' : 'Novo Cliente'">Novo Cliente</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${cliente.id != null} ? 'Editar Cliente' : 'Novo Cliente'">Novo Cliente</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container mt-4">
-        <h1 class="text-center" th:text="${cliente.id != null} ? 'Editar Cliente' : 'Novo Cliente'"></h1>
-        <form th:action="@{/clientes}" th:object="${cliente}" method="post">
-            <div class="mb-3">
-                <label for="nome" class="form-label">Nome</label>
-                <input type="text" class="form-control" id="nome" name="nome" th:field="*{nome}" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" th:field="*{email}" required>
-            </div>
-            <div class="d-flex justify-content-between">
-                <a class="btn btn-secondary" th:href="@{/clientes/form}">Voltar</a>
-                <button type="submit" class="btn btn-success">Salvar</button>
-            </div>
-        </form>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<div class="container mt-4">
+		<h1 class="text-center" th:text="${cliente.id != null} ? 'Editar Cliente' : 'Novo Cliente'"></h1>
+		<form th:action="@{/orcamentos/clientes}" th:object="${cliente}" method="post">
+
+			<div class="mb-3">
+				<label for="nome" class="form-label">Nome</label>
+				<input type="text" class="form-control" id="nome" name="nome" th:field="*{nome}" required>
+			</div>
+			<div class="mb-3">
+				<label for="email" class="form-label">Email</label>
+				<input type="email" class="form-control" id="email" name="email" th:field="*{email}" required>
+			</div>
+			<div class="mb-3">
+				<label for="telefone" class="form-label">Telefone</label>
+				<input type="text" class="form-control" id="telefone" name="telefone" th:field="*{telefone}">
+			</div>
+			<div class="mb-3">
+				<label for="empresa" class="form-label">Empresa</label>
+				<input type="text" class="form-control" id="empresa" name="empresa" th:field="*{empresa}">
+			</div>
+			<div class="d-flex justify-content-between">
+				<a class="btn btn-secondary" th:href="@{/dashboard}">Voltar</a>
+				<button type="submit" class="btn btn-success">Salvar</button>
+			</div>
+		</form>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

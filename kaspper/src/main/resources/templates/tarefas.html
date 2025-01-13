@@ -9,10 +9,14 @@
 </head>
 
 <body>
+	<div th:if="${erro}" class="alert alert-danger text-center" role="alert">
+		<span th:text="${erro}"></span>
+	</div>
+
 	<div class="container mt-4">
 		<h1 class="text-center">Lista de Tarefas</h1>
 		<div class="d-flex justify-content-end mb-3">
-			<a class="btn btn-primary" th:href="@{/orcamentos/tarefas/nova}">Nova Tarefa</a>
+			<a class="btn btn-primary" th:href="@{/dashboard}">Nova Tarefa</a>
 		</div>
 		<table class="table table-bordered table-striped">
 			<thead>
@@ -35,9 +39,6 @@
 					<td>
 						<a class="btn btn-warning btn-sm"
 							th:href="@{/orcamentos/tarefas/editar/{id}(id=${tarefa.idTarefa})}">Editar</a>
-						<a class="btn btn-danger btn-sm"
-							th:href="@{/orcamentos/tarefas/deletar/{id}(id=${tarefa.idTarefa})}"
-							onclick="return confirm('Deseja realmente excluir esta tarefa?');">Excluir</a>
 					</td>
 				</tr>
 				<tr th:if="${tarefas == null or #lists.isEmpty(tarefas)}">
