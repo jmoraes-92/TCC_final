@@ -9,6 +9,9 @@
 </head>
 
 <body class="container py-5">
+	<div>
+		<a class="btn btn-primary" th:href="@{/orcamentos/tarefas}">Voltar</a>
+	</div>
 	<h1 class="text-center mb-4">Cadastro de Tarefa</h1>
 
 	<!-- Mensagem de erro -->
@@ -17,28 +20,32 @@
 	<!-- Formulário de cadastro de tarefa -->
 	<form id="tarefaForm" class="row g-3" th:action="@{/orcamentos/tarefas/editar/{id}(id=${tarefa.idTarefa})}"
 		method="post">
-		<input type="hidden" id="idDemanda" name="idDemanda" th:value="${tarefa.demanda.id}">
+
+		<input type="hidden" id="idDemanda" name="idDemanda" th:value="${idDemanda}">
 
 		<div class="col-md-6">
 			<label for="descricao" class="form-label">Descrição</label>
-			<input type="text" id="descricao" name="descricao" class="form-control" required>
+			<input type="text" id="descricao" name="descricao" class="form-control" th:value="${tarefa.descricao}"
+				required>
 		</div>
 
 		<div class="col-md-6">
 			<label for="responsavel" class="form-label">Responsável</label>
-			<input type="text" id="responsavel" name="responsavel" class="form-control" required>
+			<input type="text" id="responsavel" name="responsavel" class="form-control" th:value="${tarefa.responsavel}"
+				required>
 		</div>
 
 		<div class="col-md-6">
 			<label for="prazo" class="form-label">Prazo</label>
-			<input type="date" id="prazo" name="prazo" class="form-control" required>
+			<input type="date" id="prazo" name="prazo" class="form-control" th:value="${prazoFormatado}" required>
 		</div>
 
 		<div class="col-md-6">
 			<label for="status" class="form-label">Status</label>
 			<select id="status" name="status" class="form-select" required>
-				<option value="PENDENTE" selected>PENDENTE</option>
-				<option value="CONCLUIDA">CONCLUÍDA</option>
+				<option value="PENDENTE" th:selected="${tarefa.status == 'PENDENTE'}">Pendente</option>
+				<option value="EM_ANDAMENTO" th:selected="${tarefa.status == 'EM_ANDAMENTO'}">Em Andamento</option>
+				<option value="FINALIZADA" th:selected="${tarefa.status == 'FINALIZADA'}">Finalizada</option>
 			</select>
 		</div>
 
@@ -47,9 +54,9 @@
 		</div>
 	</form>
 
+
 	<!-- Lista de tarefas associadas -->
 	<div id="listaTarefas" class="mt-5">
-		<h3 class="mb-3">Tarefas Associadas</h3>
 		<ul class="list-group" id="tarefas"></ul>
 	</div>
 	<div th:if="${sucesso}" class="alert alert-success text-center" role="alert">

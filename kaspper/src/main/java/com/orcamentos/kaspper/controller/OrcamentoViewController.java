@@ -207,7 +207,7 @@ public class OrcamentoViewController {
 
 		if (tarefaOptional.isEmpty()) {
 			model.addAttribute("erro", "Tarefa não encontrada.");
-			return "redirect:/orcamentos/tarefas";
+			return "redirect:/tarefas";
 		}
 
 		Tarefa tarefa = tarefaOptional.get();
@@ -216,7 +216,11 @@ public class OrcamentoViewController {
 			model.addAttribute("idDemanda", tarefa.getDemanda().getId());
 		}
 
+		// Formatando a data do prazo para exibir no formulário
+		String prazoFormatado = tarefa.getPrazo() != null ? tarefa.getPrazo().toString() : "";
+		model.addAttribute("prazoFormatado", prazoFormatado);
 		model.addAttribute("tarefa", tarefa);
+
 		return "tarefa-form";
 	}
 
@@ -241,6 +245,24 @@ public class OrcamentoViewController {
 
 		tarefaRepository.save(tarefaExistente);
 		redirectAttributes.addFlashAttribute("sucesso", "Tarefa editada com sucesso.");
+		return "redirect:/orcamentos/tarefas"; // Redireciona para a lista de tarefas
+	}
+
+	@GetMapping("/tarefas/novo")
+	public String novaTarefa(Model model) {
+		model.addAttribute("tarefa", new Tarefa());
+		return "tarefa-form";
+	}
+
+	@PostMapping("/tarefas/novo")
+	public String salvarNovaTarefa(@Valid @ModelAttribute Tarefa tarefa, BindingResult result,
+			RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			return "tarefa-form"; // Retorna o formulário em caso de erro de validação
+		}
+
+		tarefaRepository.save(tarefa);
+		redirectAttributes.addFlashAttribute("sucesso", "Tarefa criada com sucesso.");
 		return "redirect:/orcamentos/tarefas"; // Redireciona para a lista de tarefas
 	}
 

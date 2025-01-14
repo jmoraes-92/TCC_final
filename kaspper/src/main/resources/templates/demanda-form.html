@@ -19,6 +19,14 @@
 			</div>
 			<div class="card-body">
 				<form id="demandaForm">
+					<!-- Campo Cliente -->
+					<div class="mb-3">
+						<label for="cliente" class="form-label">Cliente</label>
+						<select id="cliente" class="form-select" required onchange="exibirSolicitacao()">
+							<option value="" disabled selected>Selecione um cliente</option>
+						</select>
+					</div>
+
 					<!-- Campo Descrição -->
 					<div class="mb-3">
 						<label for="descricao" class="form-label">Descrição</label>
@@ -44,14 +52,6 @@
 							<option value="EM_ANDAMENTO">Em Andamento</option>
 							<option value="CONCLUIDA">Concluída</option>
 							<option value="ABERTA">Aberta</option>
-						</select>
-					</div>
-
-					<!-- Campo Cliente -->
-					<div class="mb-3">
-						<label for="cliente" class="form-label">Cliente</label>
-						<select id="cliente" class="form-select" required onchange="exibirSolicitacao()">
-							<option value="" disabled selected>Selecione um cliente</option>
 						</select>
 					</div>
 

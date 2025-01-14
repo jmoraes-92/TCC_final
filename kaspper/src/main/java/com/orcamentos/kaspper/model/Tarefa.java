@@ -22,7 +22,8 @@ public class Tarefa {
 	@Column
 	private String responsavel;
 
-	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
 	private StatusTarefa status;
 
 	@Column
