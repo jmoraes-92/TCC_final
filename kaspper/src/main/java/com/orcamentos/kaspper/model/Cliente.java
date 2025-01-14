@@ -7,44 +7,52 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "clientes", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "clientes")
 public class Cliente {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cliente")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_cliente")
+	private Long id;
 
-    @Column(name = "nome", length = 255)
-    private String nome;
+	@Column(name = "nome", length = 255)
+	private String nome;
 
-    @Column(name = "email", length = 255, unique = true)
-    private String email;
+	@Column(name = "email", length = 255)
+	private String email;
 
-    @Column(name = "telefone", length = 255)
-    private String telefone;
+	@Column(name = "telefone", length = 255)
+	private String telefone;
 
-    @Column(name = "empresa", length = 255)
-    private String empresa;
+	@Column(name = "empresa", length = 255)
+	private String empresa;
 
-    @Column(name = "data_cadastro", nullable = false)
-    private LocalDateTime dataCadastro;
+	@Column(name = "data_cadastro", nullable = false)
+	private LocalDateTime dataCadastro;
 
-    @PrePersist
-    public void prePersist() {
-        this.dataCadastro = LocalDateTime.now();
-    }
+	@Column(name = "solicitacao", length = 300)
+	private String solicitacao;
 
+	public String getSolicitacao() {
+		return solicitacao;
+	}
+
+	public void setSolicitacao(String solicitacao) {
+		this.solicitacao = solicitacao;
+	}
+
+	@PrePersist
+	public void prePersist() {
+		this.dataCadastro = LocalDateTime.now();
+	}
 
 	public Long getId() {
 		return id;
 	}
 
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 
 	public String getNome() {
 		return nome;
@@ -85,5 +93,5 @@ public class Cliente {
 	public void setDataCadastro(LocalDateTime dataCadastro) {
 		this.dataCadastro = dataCadastro;
 	}
-    
+
 }

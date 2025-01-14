@@ -2,6 +2,7 @@ package com.orcamentos.kaspper.controller;
 
 import com.orcamentos.kaspper.dto.DemandaRequestDTO;
 import com.orcamentos.kaspper.exception.ResourceNotFoundException;
+import com.orcamentos.kaspper.model.Cliente;
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Tarefa;
 import com.orcamentos.kaspper.model.enums.Prioridade;
@@ -24,7 +25,7 @@ public class DemandaController {
 	private DemandaService demandaService;
 
 	@Autowired
-	private TarefaService tarefaService; // Injeção do serviço de tarefas para buscar tarefas existentes.
+	private TarefaService tarefaService; 
 
 	private boolean isValidStatus(String status) {
 		try {
@@ -122,4 +123,11 @@ public class DemandaController {
 		demandaService.deletarDemanda(id);
 		return ResponseEntity.noContent().build();
 	}
+	
+	@GetMapping("/clientes-solicitacoes")
+	public ResponseEntity<List<Cliente>> listarClientesComSolicitacoes() {
+	    List<Cliente> clientes = demandaService.listarClientesComSolicitacoes();
+	    return ResponseEntity.ok(clientes);
+	}
+
 }

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cadastrar Demanda</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+	<div class="container mt-5">
+		<div class="card shadow-lg">
+			<div class="card-header bg-primary text-white">
+				<h4 class="mb-0">
+					<i class="material-icons">assignment</i> Cadastrar Demanda
+				</h4>
+			</div>
+			<div class="card-body">
+				<form id="demandaForm">
+					<!-- Campo Descrição -->
+					<div class="mb-3">
+						<label for="descricao" class="form-label">Descrição</label>
+						<input type="text" id="descricao" class="form-control"
+							placeholder="Digite a descrição da demanda" required>
+					</div>
+
+					<!-- Campo Prioridade -->
+					<div class="mb-3">
+						<label for="prioridade" class="form-label">Prioridade</label>
+						<select id="prioridade" class="form-select" required>
+							<option value="ALTA">Alta</option>
+							<option value="MEDIA">Média</option>
+							<option value="BAIXA">Baixa</option>
+						</select>
+					</div>
+
+					<!-- Campo Status -->
+					<div class="mb-3">
+						<label for="status" class="form-label">Status</label>
+						<select id="status" class="form-select" required>
+							<option value="NOVA">Nova</option>
+							<option value="EM_ANDAMENTO">Em Andamento</option>
+							<option value="CONCLUIDA">Concluída</option>
+							<option value="ABERTA">Aberta</option>
+						</select>
+					</div>
+
+					<!-- Campo Cliente -->
+					<div class="mb-3">
+						<label for="cliente" class="form-label">Cliente</label>
+						<select id="cliente" class="form-select" required onchange="exibirSolicitacao()">
+							<option value="" disabled selected>Selecione um cliente</option>
+						</select>
+					</div>
+
+					<!-- Campo Solicitação -->
+					<div class="mb-3">
+						<label for="solicitacao" class="form-label">Solicitação</label>
+						<textarea id="solicitacao" class="form-control" rows="3" readonly></textarea>
+					</div>
+
+					<div class="d-flex justify-content-end">
+						<button type="submit" class="btn btn-success">
+							<i class="material-icons">send</i> Cadastrar
+						</button>
+						<a href="/dashboard" class="btn btn-secondary ms-2">
+							<i class="material-icons">arrow_back</i> Voltar
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		// Função para carregar a lista de clientes com suas solicitações ao carregar a página
+		document.addEventListener("DOMContentLoaded", function () {
+			fetch('http://localhost:8080/api/demandas/clientes-solicitacoes')
+				.then(response => response.json())
+				.then(data => {
+					const clienteSelect = document.getElementById('cliente');
+					data.forEach(cliente => {
+						const option = document.createElement('option');
+						option.value = cliente.id;
+						option.textContent = cliente.nome;
+						option.dataset.solicitacao = cliente.solicitacao || 'Nenhuma solicitação cadastrada';
+						clienteSelect.appendChild(option);
+					});
+				})
+				.catch(error => console.error('Erro ao carregar clientes:', error));
+		});
+
+		// Função para exibir a solicitação do cliente selecionado
+		function exibirSolicitacao() {
+			const clienteSelect = document.getElementById('cliente');
+			const solicitacaoText = clienteSelect.selectedOptions[0].dataset.solicitacao;
+
+			// Log para verificar a solicitação selecionada
+			console.log('Cliente selecionado:', clienteSelect.value);
+			console.log('Solicitação exibida:', solicitacaoText);
+
+			document.getElementById('solicitacao').value = solicitacaoText;
+		}
+
+		// Função para lidar com o envio do formulário
+		document.getElementById('demandaForm').addEventListener('submit', function (event) {
+			event.preventDefault();
+
+			const demanda = {
+				descricao: document.getElementById('descricao').value,
+				prioridade: document.getElementById('prioridade').value,
+				status: document.getElementById('status').value,
+				cliente: {id: document.getElementById('cliente').value}
+			};
+
+			fetch('http://localhost:8080/api/demandas/criar', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(demanda)
+			})
+				.then(response => {
+					if (response.ok) {
+						alert('Demanda cadastrada com sucesso!');
+						window.location.href = '/dashboard';
+					} else {
+						return response.json().then(err => {
+							throw new Error(err.message || 'Erro ao cadastrar demanda');
+						});
+					}
+				})
+				.catch(error => alert('Erro: ' + error.message));
+		});
+	</script>
+</body>
+
+</html>

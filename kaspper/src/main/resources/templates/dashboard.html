@@ -7,7 +7,7 @@
 	<title>Dashboard - Gestão de Orçamentos</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	
+
 	<style>
 		.styled-div {
 			background-color: #ccc;
@@ -29,7 +29,7 @@
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<div class="container-fluid">
-			
+
 			<a class="navbar-brand" href="#">Kaspper</a>
 			<button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
 				<span class="navbar-toggler-icon"></span>
@@ -38,6 +38,9 @@
 				<ul class="navbar-nav">
 					<li class="nav-item">
 						<a class="nav-link" th:href="@{/orcamentos/clientes/novo}">Clientes</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:href="@{/orcamentos/demandas/novo}">Demandas</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" th:href="@{/orcamentos}">Orçamentos</a>
@@ -52,52 +55,52 @@
 	</nav>
 	<div class="container mt-4">
 		<div class="styled-div">
-		<h1 class="text-center">Dashboard</h1>
-		<div class="row">
-			<div class="col-md-6">
-				<h3>Status das Tarefas</h3>
-				<canvas id="tarefasStatusChart"></canvas>
-			</div>
-			<div class="col-md-6">
-				<h3>Orçamentos Gerados</h3>
-				<canvas id="orcamentosChart"></canvas>
+			<h1 class="text-center">Dashboard</h1>
+			<div class="row">
+				<div class="col-md-6">
+					<h3>Status das Tarefas</h3>
+					<canvas id="tarefasStatusChart"></canvas>
+				</div>
+				<div class="col-md-6">
+					<h3>Orçamentos Gerados</h3>
+					<canvas id="orcamentosChart"></canvas>
+				</div>
 			</div>
 		</div>
-	</div>
-	
-				
-			
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			// Gráfico de Status das Tarefas
-			const tarefasStatusCtx = document.getElementById('tarefasStatusChart').getContext('2d');
-			new Chart(tarefasStatusCtx, {
-				type: 'pie',
-				data: {
-					labels: ['Concluído', 'Pendente', 'Em Progresso'],
-					datasets: [{
-						label: 'Status',
-						data: [10, 5, 3], // Dados fake
-						backgroundColor: ['#4caf50', '#f44336', '#2196f3']
-					}]
-				}
-			});
 
-			// Gráfico de Orçamentos Gerados
-			const orcamentosCtx = document.getElementById('orcamentosChart').getContext('2d');
-			new Chart(orcamentosCtx, {
-				type: 'bar',
-				data: {
-					labels: ['Janeiro', 'Fevereiro', 'Março'],
-					datasets: [{
-						label: 'Orçamentos',
-						data: [15, 20, 25], // Substituir por dados reais
-						backgroundColor: ['#673ab7', '#3f51b5', '#00bcd4']
-					}]
-				}
+
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				// Gráfico de Status das Tarefas
+				const tarefasStatusCtx = document.getElementById('tarefasStatusChart').getContext('2d');
+				new Chart(tarefasStatusCtx, {
+					type: 'pie',
+					data: {
+						labels: ['Concluído', 'Pendente', 'Em Progresso'],
+						datasets: [{
+							label: 'Status',
+							data: [10, 5, 3], // Dados fake
+							backgroundColor: ['#4caf50', '#f44336', '#2196f3']
+						}]
+					}
+				});
+
+				// Gráfico de Orçamentos Gerados
+				const orcamentosCtx = document.getElementById('orcamentosChart').getContext('2d');
+				new Chart(orcamentosCtx, {
+					type: 'bar',
+					data: {
+						labels: ['Janeiro', 'Fevereiro', 'Março'],
+						datasets: [{
+							label: 'Orçamentos',
+							data: [15, 20, 25], // Substituir por dados reais
+							backgroundColor: ['#673ab7', '#3f51b5', '#00bcd4']
+						}]
+					}
+				});
 			});
-		});
-	</script>
+		</script>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

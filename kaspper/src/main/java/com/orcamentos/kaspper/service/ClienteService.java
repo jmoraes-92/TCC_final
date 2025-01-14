@@ -1,6 +1,7 @@
 package com.orcamentos.kaspper.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,15 @@ public class ClienteService {
 	private ClienteRepository clienteRepository;
 
 	public Cliente salvar(Cliente cliente) {
-		if (clienteRepository.existsByEmail(cliente.getEmail())) {
-			throw new IllegalArgumentException("Já existe um cliente com o email informado.");
-		}
-		return clienteRepository.save(cliente);
+	    Optional<Cliente> clienteExistente = clienteRepository.findByEmail(cliente.getEmail());
+	    
+	    if (clienteExistente.isPresent()) {
+	        cliente.setId(clienteExistente.get().getId()); // Define o ID do cliente existente para atualizar
+	    }
+	    
+	    return clienteRepository.save(cliente);
 	}
+
 
 	public List<Cliente> listarTodos() {
 		return clienteRepository.findAll();

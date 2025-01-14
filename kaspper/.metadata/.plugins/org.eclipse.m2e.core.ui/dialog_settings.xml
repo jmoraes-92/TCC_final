@@ -2,6 +2,8 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\maven\projeto"/>
+			<item value="C:\maven\projeto\kaspper"/>
 			<item value="E:\Documentos Não Apagar\Desktop\Nova pasta\kaspper"/>
 		</list>
 		<list key="projectNameTemplate">
