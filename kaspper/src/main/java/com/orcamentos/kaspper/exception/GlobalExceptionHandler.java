@@ -1,5 +1,6 @@
 package com.orcamentos.kaspper.exception;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,11 +22,12 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-		Map<String, String> errorResponse = new HashMap<>();
-		errorResponse.put("error", "Argumento inválido");
-		errorResponse.put("message", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+		Map<String, Object> response = new HashMap<>();
+		response.put("error", "Argumento inválido");
+		response.put("message", ex.getMessage());
+		response.put("timestamp", LocalDateTime.now());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)

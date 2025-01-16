@@ -14,27 +14,36 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class NotificacaoController {
 
-    @Autowired
-    private NotificacaoService notificacaoService;
+	@Autowired
+	private NotificacaoService notificacaoService;
 
-    @PostMapping
-    public ResponseEntity<Notificacao> enviarNotificacao(@RequestBody NotificacaoRequestDTO notificacaoRequestDTO) {
-        Notificacao notificacao = notificacaoService.enviarNotificacao(
-            notificacaoRequestDTO.getIdUsuario(),
-            notificacaoRequestDTO.getMensagem()
-        );
-        return ResponseEntity.ok(notificacao);
-    }
+	// Enviar notificação para um usuário específico
+	@PostMapping
+	public ResponseEntity<Notificacao> enviarNotificacao(@RequestBody NotificacaoRequestDTO notificacaoRequestDTO) {
+		Notificacao notificacao = notificacaoService.enviarNotificacao(notificacaoRequestDTO.getIdUsuario(),
+				notificacaoRequestDTO.getMensagem());
+		return ResponseEntity.ok(notificacao);
+	}
 
-    @PatchMapping("/{id}/visualizar")
-    public ResponseEntity<Notificacao> marcarComoVisualizada(@PathVariable Long id) {
-        Notificacao notificacao = notificacaoService.marcarComoVisualizada(id);
-        return ResponseEntity.ok(notificacao);
-    }
+	// Marcar notificação como visualizada
+	@PatchMapping("/{id}/visualizar")
+	public ResponseEntity<Notificacao> marcarComoVisualizada(@PathVariable Long id) {
+		Notificacao notificacao = notificacaoService.marcarComoVisualizada(id);
+		return ResponseEntity.ok(notificacao);
+	}
 
-    @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<List<Notificacao>> listarNotificacoesPorUsuario(@PathVariable Long idUsuario) {
-        List<Notificacao> notificacoes = notificacaoService.listarNotificacoesPorUsuario(idUsuario);
-        return ResponseEntity.ok(notificacoes);
-    }
+	// Listar notificações por usuário
+	@GetMapping("/usuario/{idUsuario}")
+	public ResponseEntity<List<Notificacao>> listarNotificacoesPorUsuario(@PathVariable Long idUsuario) {
+		List<Notificacao> notificacoes = notificacaoService.listarNotificacoesPorUsuario(idUsuario);
+		return ResponseEntity.ok(notificacoes);
+	}
+
+	// Listar notificações não visualizadas
+	@GetMapping("/nao-visualizadas")
+	public ResponseEntity<List<Notificacao>> listarNaoVisualizadas() {
+		List<Notificacao> notificacoes = notificacaoService.listarNaoVisualizadas();
+		return ResponseEntity.ok(notificacoes);
+	}
+
 }

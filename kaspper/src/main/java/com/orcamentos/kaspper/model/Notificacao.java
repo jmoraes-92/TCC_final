@@ -26,7 +26,7 @@ public class Notificacao {
     private LocalDateTime dataEnvio;
 
     @Column(name = "visualizada", nullable = false)
-    private boolean visualizada;
+    private boolean visualizada = false;
 
     @PrePersist
     public void prePersist() {

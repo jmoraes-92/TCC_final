@@ -1,4 +1,5 @@
 package com.orcamentos.kaspper.controller;
+
 import com.orcamentos.kaspper.model.Cliente;
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Orcamento;
@@ -7,6 +8,7 @@ import com.orcamentos.kaspper.repository.ClienteRepository;
 import com.orcamentos.kaspper.repository.DemandaRepository;
 import com.orcamentos.kaspper.repository.OrcamentoRepository;
 import com.orcamentos.kaspper.repository.TarefaRepository;
+import com.orcamentos.kaspper.service.NotificacaoService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -52,6 +54,9 @@ public class OrcamentoViewController {
 
 	@Autowired
 	private SpringTemplateEngine templateEngine;
+
+	@Autowired
+	private NotificacaoService notificacaoService;
 
 	@GetMapping
 	public String listarOrcamentos(Model model) {
@@ -289,6 +294,10 @@ public class OrcamentoViewController {
 	@PostMapping("/clientes")
 	public String salvarCliente(@ModelAttribute Cliente cliente) {
 		clienteRepository.save(cliente);
+
+		// Envia notificação
+		notificacaoService.enviarNotificacaoParaAdmin("Você tem uma nova solicitação de orçamento!");
+
 		return "redirect:/orcamentos/clientes";
 	}
 

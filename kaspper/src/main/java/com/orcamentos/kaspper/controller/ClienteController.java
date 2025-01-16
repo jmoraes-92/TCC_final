@@ -2,6 +2,7 @@ package com.orcamentos.kaspper.controller;
 
 import com.orcamentos.kaspper.model.Cliente;
 import com.orcamentos.kaspper.service.ClienteService;
+import com.orcamentos.kaspper.service.NotificacaoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class ClienteController {
 	@Autowired
 	private ClienteService clienteService;
 
+	@Autowired
+	private NotificacaoService notificacaoService;
+
 	@GetMapping
 	public ResponseEntity<List<Cliente>> listarTodos() {
 		return ResponseEntity.ok(clienteService.listarTodos());
@@ -29,7 +33,12 @@ public class ClienteController {
 
 	@PostMapping
 	public ResponseEntity<Cliente> salvar(@RequestBody Cliente cliente) {
-		return ResponseEntity.ok(clienteService.salvar(cliente));
+		Cliente novoCliente = clienteService.salvar(cliente);
+
+		// Cria a notificação para o administrador
+		notificacaoService.enviarNotificacaoParaAdmin("Você tem uma nova solicitação de orçamento!");
+
+		return ResponseEntity.ok(novoCliente);
 	}
 
 	@PutMapping("/{id}")

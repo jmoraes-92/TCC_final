@@ -11,17 +11,25 @@
 	<style>
 		.styled-div {
 			background-color: #ccc;
-			/* Fundo cinza */
 			border: 2px solid #000;
-			/* Bordas sólidas pretas */
 			box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-			/* Sombra para a direita e para baixo */
 			padding: 20px;
-			/* Espaçamento interno */
 			width: auto;
-			/* Largura */
 			margin: 50px auto;
-			/* Centralizar horizontalmente */
+		}
+
+		.alert {
+			position: fixed;
+			top: 10%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 1050;
+			min-width: 300px;
+			text-align: center;
+		}
+
+		.alert+.alert {
+			margin-top: 60px;
 		}
 	</style>
 </head>
@@ -29,25 +37,16 @@
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<div class="container-fluid">
-
 			<a class="navbar-brand" href="#">Kaspper</a>
 			<button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav">
-					<li class="nav-item">
-						<a class="nav-link" th:href="@{/orcamentos/clientes}">Clientes</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" th:href="@{/orcamentos/demandas/novo}">Demandas</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" th:href="@{/orcamentos/tarefas}">Tarefas</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" th:href="@{/orcamentos}">Orçamentos</a>
-					</li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/orcamentos/clientes}">Clientes</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/orcamentos/demandas/novo}">Demandas</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/orcamentos/tarefas}">Tarefas</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/orcamentos}">Orçamentos</a></li>
 				</ul>
 			</div>
 			<a class="btn btn-success" th:href="@{/orcamentos/novo}">Novo orçamento</a>
@@ -67,12 +66,60 @@
 				</div>
 			</div>
 		</div>
-
-
-
 		<script>
 			document.addEventListener("DOMContentLoaded", async () => {
-				// Função genérica para buscar dados da API
+				console.log('Página carregada, iniciando busca por notificações.');
+				buscarNotificacoes();
+
+				async function buscarNotificacoes() {
+					try {
+						console.log('Iniciando a busca por notificações...');
+						const response = await fetch('/api/notificacoes/nao-visualizadas');
+						if (!response.ok) {
+							throw new Error("Erro ao buscar notificações");
+						}
+						const notificacoes = await response.json();
+						console.log('Notificações recebidas:', notificacoes);
+
+						notificacoes.forEach(notificacao => {
+							exibirPopUp(notificacao);
+						});
+					} catch (error) {
+						console.error('Erro ao buscar notificações:', error);
+					}
+				}
+
+				function exibirPopUp(notificacao) {
+					console.log('Exibindo pop-up para notificação:', notificacao);
+					const popup = document.createElement('div');
+					popup.className = 'alert alert-info alert-dismissible fade show';
+					popup.role = 'alert';
+					popup.innerHTML = `<strong>${notificacao.mensagem}</strong>`;
+
+					// Criar o botão via JavaScript
+					const button = document.createElement('button');
+					button.textContent = 'Marcar como lido';
+					button.className = 'btn btn-success btn-sm';
+					button.addEventListener('click', () => marcarComoLido(notificacao.id, popup));
+
+					popup.appendChild(button);
+					document.body.appendChild(popup);
+				}
+
+				async function marcarComoLido(id, popup) {
+					try {
+						console.log(`Marcando notificação ${id} como lida...`);
+						const response = await fetch(`/api/notificacoes/${id}/visualizar`, {method: 'PATCH'});
+						if (!response.ok) {
+							throw new Error("Erro ao marcar notificação como lida");
+						}
+						console.log(`Notificação ${id} marcada como lida.`);
+						popup.remove(); // Remove o pop-up ao clicar
+					} catch (error) {
+						console.error('Erro ao marcar notificação como lida:', error);
+					}
+				}
+
 				async function fetchData(url) {
 					try {
 						const response = await fetch(url);
@@ -86,7 +133,6 @@
 					}
 				}
 
-				// Carregar status das tarefas
 				const tarefasData = await fetchData('/orcamentos/tarefas/status');
 				if (tarefasData) {
 					const statusLabels = Object.keys(tarefasData);
@@ -99,22 +145,18 @@
 							datasets: [{
 								label: 'Status das Tarefas',
 								data: statusCounts,
-								backgroundColor: ['#4caf50', '#f44336', '#2196f3', '#ff9800'] // Cores para cada status
+								backgroundColor: ['#4caf50', '#f44336', '#2196f3', '#ff9800']
 							}]
 						}
 					});
 				}
 
-				// Carregar dados de orçamentos
 				const orcamentosData = await fetchData('/orcamentos/dashboard/orcamentos-mensais');
 				if (orcamentosData) {
-					// Array de todos os meses para garantir a ordem correta
 					const todosMeses = [
 						'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
 						'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
 					];
-
-					// Ordenar os meses e preencher valores faltantes com 0
 					const mesesLabels = todosMeses.filter(mes => mes in orcamentosData);
 					const orcamentosCounts = mesesLabels.map(mes => orcamentosData[mes] || 0);
 
@@ -132,7 +174,6 @@
 				}
 			});
 		</script>
-
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
