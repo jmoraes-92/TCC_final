@@ -71,36 +71,68 @@
 
 
 		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-				// Gráfico de Status das Tarefas
-				const tarefasStatusCtx = document.getElementById('tarefasStatusChart').getContext('2d');
-				new Chart(tarefasStatusCtx, {
-					type: 'pie',
-					data: {
-						labels: ['Concluído', 'Pendente', 'Em Progresso'],
-						datasets: [{
-							label: 'Status',
-							data: [10, 5, 3], // Dados fake
-							backgroundColor: ['#4caf50', '#f44336', '#2196f3']
-						}]
+			document.addEventListener("DOMContentLoaded", async () => {
+				// Função genérica para buscar dados da API
+				async function fetchData(url) {
+					try {
+						const response = await fetch(url);
+						if (!response.ok) {
+							throw new Error(`Erro na API: ${response.status}`);
+						}
+						return await response.json();
+					} catch (error) {
+						console.error("Erro ao buscar dados:", error);
+						return null;
 					}
-				});
+				}
 
-				// Gráfico de Orçamentos Gerados
-				const orcamentosCtx = document.getElementById('orcamentosChart').getContext('2d');
-				new Chart(orcamentosCtx, {
-					type: 'bar',
-					data: {
-						labels: ['Janeiro', 'Fevereiro', 'Março'],
-						datasets: [{
-							label: 'Orçamentos',
-							data: [15, 20, 25], // Substituir por dados reais
-							backgroundColor: ['#673ab7', '#3f51b5', '#00bcd4']
-						}]
-					}
-				});
+				// Carregar status das tarefas
+				const tarefasData = await fetchData('/orcamentos/tarefas/status');
+				if (tarefasData) {
+					const statusLabels = Object.keys(tarefasData);
+					const statusCounts = Object.values(tarefasData);
+
+					new Chart(document.getElementById('tarefasStatusChart').getContext('2d'), {
+						type: 'pie',
+						data: {
+							labels: statusLabels,
+							datasets: [{
+								label: 'Status das Tarefas',
+								data: statusCounts,
+								backgroundColor: ['#4caf50', '#f44336', '#2196f3', '#ff9800'] // Cores para cada status
+							}]
+						}
+					});
+				}
+
+				// Carregar dados de orçamentos
+				const orcamentosData = await fetchData('/orcamentos/dashboard/orcamentos-mensais');
+				if (orcamentosData) {
+					// Array de todos os meses para garantir a ordem correta
+					const todosMeses = [
+						'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+						'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
+					];
+
+					// Ordenar os meses e preencher valores faltantes com 0
+					const mesesLabels = todosMeses.filter(mes => mes in orcamentosData);
+					const orcamentosCounts = mesesLabels.map(mes => orcamentosData[mes] || 0);
+
+					new Chart(document.getElementById('orcamentosChart').getContext('2d'), {
+						type: 'bar',
+						data: {
+							labels: mesesLabels,
+							datasets: [{
+								label: 'Orçamentos Mensais',
+								data: orcamentosCounts,
+								backgroundColor: ['#673ab7', '#3f51b5', '#00bcd4', '#e91e63', '#ffc107']
+							}]
+						}
+					});
+				}
 			});
 		</script>
+
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

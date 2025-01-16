@@ -1,6 +1,4 @@
 package com.orcamentos.kaspper.controller;
-
-import com.orcamentos.kaspper.exception.ResourceNotFoundException;
 import com.orcamentos.kaspper.model.Cliente;
 import com.orcamentos.kaspper.model.Demanda;
 import com.orcamentos.kaspper.model.Orcamento;
@@ -33,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/orcamentos")
@@ -153,10 +152,6 @@ public class OrcamentoViewController {
 		Orcamento orcamento = orcamentoOptional.get();
 		List<Tarefa> tarefas = tarefaRepository.findByDemandaId(orcamento.getDemanda().getId().intValue());
 
-		// Log para verificar se os dados estão corretos
-		System.out.println("Orçamento ID: " + orcamento.getId());
-		System.out.println("Total de tarefas: " + tarefas.size());
-
 		// Configurar o modelo de dados para o template
 		Map<String, Object> model = new HashMap<>();
 		model.put("orcamento", orcamento);
@@ -170,8 +165,6 @@ public class OrcamentoViewController {
 				writer);
 
 		String htmlContent = writer.toString();
-		System.out.println("HTML Gerado para o PDF:");
-		System.out.println(htmlContent);
 
 		// Configurar a resposta HTTP para PDF
 		response.setContentType("application/pdf");
@@ -252,6 +245,20 @@ public class OrcamentoViewController {
 	public String novaTarefa(Model model) {
 		model.addAttribute("tarefa", new Tarefa());
 		return "tarefa-form";
+	}
+
+	@GetMapping("/tarefas/status")
+	@ResponseBody
+	public Map<String, Long> obterStatusTarefas() {
+		return tarefaRepository.findAll().stream()
+				.collect(Collectors.groupingBy(t -> t.getStatus().toString(), Collectors.counting()));
+	}
+
+	@GetMapping("/dashboard/orcamentos-mensais")
+	@ResponseBody
+	public Map<String, Long> obterOrcamentosMensais() {
+		return orcamentoRepository.findAll().stream()
+				.collect(Collectors.groupingBy(o -> o.getDataGeracao().getMonth().toString(), Collectors.counting()));
 	}
 
 	@PostMapping("/tarefas/novo")
