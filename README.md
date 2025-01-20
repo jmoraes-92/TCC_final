@@ -1,4 +1,4 @@
-#Gerenciador de Orçamentos Kaspper
+# Gerenciador de Orçamentos Kaspper
 
 ## Visão Geral
 O **Gerenciador de Orçamentos Kaspper** é um sistema desenvolvido em **Java** com **Spring Boot** para auxiliar no gerenciamento de demandas, tarefas e orçamentos. Possui uma interface web interativa e responsiva construída com **Thymeleaf**, proporcionando uma experiência prática e intuitiva.
