@@ -1,99 +1,110 @@
 # Gerenciador de Orçamentos Kaspper
 
 ## Visão Geral
-O projeto Gerenciador de Orçamentos Kaspper é um sistema desenvolvido em **Java** utilizando **Spring Boot** para gerenciar demandas, tarefas e orçamentos. Ele conta com um frontend integrado ao **Thymeleaf**, fornecendo uma interface responsiva para interação com os dados.
+O **Gerenciador de Orçamentos Kaspper** é um sistema desenvolvido em **Java** com **Spring Boot** para auxiliar no gerenciamento de demandas, tarefas e orçamentos. Possui uma interface web interativa e responsiva construída com **Thymeleaf**, proporcionando uma experiência prática e intuitiva.
 
 ## Funcionalidades
-- **Gerenciamento de Orçamentos**:
-  - Criação de orçamentos baseados em demandas.
-  - Atualização e exclusão de orçamentos existentes.
-  - Listagem e detalhamento de orçamentos gerados.
+- **Gestão de Orçamentos**:
+  - Criação, atualização e exclusão de orçamentos.
+  - Visualização detalhada e listagem de orçamentos.
 - **Integração com Demandas e Clientes**:
-  - Associar demandas a clientes.
-  - Gerenciar tarefas relacionadas a cada demanda.
-- **Frontend Interativo**:
-  - Visualização de dados com **Thymeleaf**.
-  - Formulários interativos para operações CRUD.
+  - Associação de demandas a clientes.
+  - Gerenciamento de tarefas vinculadas a cada demanda.
+- **Interface Web Responsiva**:
+  - Renderização dinâmica com **Thymeleaf**.
+  - Suporte a operações CRUD via formulários interativos.
 - **Filtros Avançados**:
-  - Buscar orçamentos com filtros por status, valor ou prazo.
+  - Pesquisa de orçamentos com base em status, valor ou prazo.
 - **Documentação de API**:
-  - Configurado com **Swagger** para exploração de endpoints.
+  - Endpoints documentados com **Swagger**, facilitando a exploração e o consumo.
 
-## Requisitos
+## Pré-Requisitos
 - **Java** 17 ou superior.
 - **Maven** para gerenciamento de dependências.
-- **Banco de Dados** H2 (em memória) para ambiente de desenvolvimento.
+- **Banco de Dados** H2 (em memória) configurado para desenvolvimento.
 
 ## Estrutura do Projeto
-
 ```
 projeto/
 ├── src/main/java/com/orcamentos/kaspper
-│   ├── config/           # Configurações gerais do sistema (CORS, Swagger)
-│   ├── controller/       # Controladores para exposição de endpoints
-│   ├── dto/              # Objetos de transferência de dados
-│   ├── exception/        # Tratamento de exceções
-│   ├── model/            # Modelos de dados
-│   ├── repository/       # Interfaces de repositórios para JPA
+│   ├── config/           # Configurações (CORS, Swagger, etc.)
+│   ├── controller/       # Controladores responsáveis pelos endpoints
+│   ├── dto/              # Objetos para transferência de dados
+│   ├── exception/        # Tratamento e personalização de erros
+│   ├── model/            # Definições de modelos de dados
+│   ├── repository/       # Interfaces JPA para acesso ao banco
 │   ├── service/          # Lógica de negócios
-│   └── KaspperApplication.java  # Classe principal da aplicação
+│   └── KaspperApplication.java  # Classe principal para inicialização
 ├── src/main/resources/
-│   ├── templates/        # Arquivos Thymeleaf
-│   ├── application.properties  # Configurações de aplicação
-│   ├── schema.sql        # Script de criação de tabelas
-│   └── sql/triggers.sql  # Definições de triggers do banco de dados
-├── pom.xml               # Configurações do Maven
+│   ├── templates/        # Arquivos de template Thymeleaf
+│   ├── application.properties  # Configurações da aplicação
+│   ├── schema.sql        # Script de criação do esquema do banco
+│   └── sql/triggers.sql  # Definições de triggers no banco
+├── pom.xml               # Arquivo de configuração do Maven
 └── README.md             # Documentação do projeto
 ```
 
-## Configuração
+## Configuração e Execução
 
-1. **Clonar o Repositório**:
+1. **Clone o Repositório**:
    ```bash
    git clone <url-do-repositorio>
    cd projeto
    ```
 
-2. **Configurar o Banco de Dados**:
-   O banco de dados H2 está configurado como padrão em `application.properties`. Caso deseje usar outro banco, atualize as credenciais no mesmo arquivo.
+2. **Configuração do Banco de Dados**:
+   - O projeto utiliza o banco de dados H2 (em memória) como padrão.
+   - Caso prefira usar outro banco, ajuste as configurações no arquivo `application.properties`.
 
-3. **Executar a Aplicação**:
+3. **Execute a Aplicação**:
    ```bash
    mvn spring-boot:run
    ```
 
-4. **Acessar a Aplicação**:
+4. **Acesse o Sistema**:
    - Interface Web: [http://localhost:8080](http://localhost:8080)
-   - Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+   - Documentação Swagger: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-## Endpoints Principais
+## Principais Endpoints
 
 ### Orçamentos
-- **Listar Todos**: `GET /api/orcamentos`
+- **Listar todos**: `GET /api/orcamentos`
 - **Buscar por ID**: `GET /api/orcamentos/{id}`
-- **Criar**: `POST /api/orcamentos`
-- **Atualizar**: `PUT /api/orcamentos/{id}`
+- **Criar novo**: `POST /api/orcamentos`
+- **Atualizar existente**: `PUT /api/orcamentos/{id}`
 - **Excluir**: `DELETE /api/orcamentos/{id}`
 - **Filtrar**: `GET /api/orcamentos/filtrar`
 
 ### Demandas
-- **Listar Todas**: `GET /api/demandas`
+- **Listar todas**: `GET /api/demandas`
 - **Buscar por ID**: `GET /api/demandas/{id}`
 
 ### Clientes
-- **Listar Todos**: `GET /api/clientes`
+- **Listar todos**: `GET /api/clientes`
 
 ## Tecnologias Utilizadas
 - **Java** com **Spring Boot**.
+- **Thymeleaf** para renderização do frontend.
+- **H2 Database** para persistência no ambiente de desenvolvimento.
 - **Maven** para gerenciamento de dependências.
-- **H2 Database** para persistência.
-- **Thymeleaf** para renderização de templates.
-- **Swagger** para documentação de API.
+- **Swagger** para documentação da API.
 
-## Contribuições
-Contribuições são bem-vindas! Por favor, crie um fork do repositório e envie um pull request com suas modificações.
+## 🤝 Contribuidores
+Este projeto foi desenvolvido por:
+- [@jmoraes-92](https://github.com/jmoraes-92)
+- [@Isaacboniii](https://github.com/Isaacboniii)
+- [@Idalvo](https://github.com/Idalvo)
+- [@contagiovaneines](https://github.com/Contagiovaneines)
 
-## Licença
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+---
+
+## 🖋️ Autor e Finalidade
+Este sistema foi desenvolvido como parte do Trabalho de Conclusão de Curso da equipe **Kaspper**, com o objetivo de aplicar práticas modernas de desenvolvimento web e resolver um problema de gerenciamento de orçamentos.
+
+---
+
+## 🛠️ Licença
+© Kaspper, 2025. Todos os direitos reservados.
+Este software é proprietário e seu uso está sujeito às condições expressas no contrato de licença.
 
 
